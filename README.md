@@ -910,7 +910,9 @@ The above code implements `build_char_`. It makes it a template metaprogramming
 value by adding `type` and makes it a template metafunction class by adding the
 `apply` metafunction. All it does is that it wraps its argument with `r_char`.
 
-TODO image goes here
+![The char_ parser](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/transform.png
+)
 
 #### Implementing `item`
 
@@ -1052,7 +1054,9 @@ As we have implemented `unary_item` as well, we can now implement the start
 symbol of the grammar, `reg_exp`. This is a number of `unary_item`s. Let's look
 at the syntax tree of the regular expression `abc`:
 
-TODO image goes here
+![The syntax tree of "abc"](
+https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/abc_syntax_tree.png
+)
 
 As you can see, `reg_exp` has three `unary_item` children. Each of them parsed
 one character of the regular expression. The `reg_exp` parser should produce the
