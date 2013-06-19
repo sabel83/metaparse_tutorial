@@ -4064,6 +4064,14 @@
        y1="493.79077"
        x2="-265.71429"
        y2="493.79077" />
+    <filter
+       inkscape:collect="always"
+       id="filter4394">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="9.9025851"
+         id="feGaussianBlur4396" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -4072,8 +4080,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.63622997"
-     inkscape:cx="375.71472"
+     inkscape:zoom="0.44988253"
+     inkscape:cx="322.09014"
      inkscape:cy="512.82053"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -4091,7 +4099,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -4100,7 +4108,8 @@
      inkscape:groupmode="layer"
      id="layer1">
     <g
-       id="g9054">
+       id="g9054"
+       transform="translate(-6.7294896,-0.64682969)">
       <g
          transform="translate(0,22)"
          id="g9046">
@@ -4580,5 +4589,13 @@
            ry="0.25372311" />
       </g>
     </g>
+    <rect
+       style="fill:none;stroke:#808080;stroke-width:5.23899983999999996;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4394)"
+       id="rect3596"
+       width="2471.7563"
+       height="1489.2777"
+       x="-866.89294"
+       y="-205.74403"
+       ry="167.19226" />
   </g>
 </svg>
