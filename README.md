@@ -227,7 +227,9 @@ is called, it builds a matching object for the regular expression `a`. As `r_a`
 is a class, it could be the result of a template metaprogram. So the process of
 turning a string literal into a matching object is the following:
 
-TODO: image goes here
+![Turning a string literal into a matching object](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/r_a.png
+)
 
 * Pass the string literal to a template metaprogram
 * The template metaprogram returns a class with a public static `run()` method
