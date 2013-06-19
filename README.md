@@ -1322,7 +1322,6 @@ You can find the solutions of the exercises in the `solution` directory of the
 source code you have downloaded.
 
 ## License
--------
 
 The tutorial is published under the
 [Boost Software License](http://www.boost.org/LICENSE_1_0.txt).
