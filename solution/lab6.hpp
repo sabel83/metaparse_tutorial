@@ -34,7 +34,7 @@ struct build_char_
   typedef build_char_ type;
 
   template <class C>
-  using apply = r_char<C>;
+  struct apply : r_char<C> {};
 };
 
 template <class RegExp, char Repeat>
@@ -51,11 +51,12 @@ struct build_unary_item
   typedef build_unary_item type;
 
   template <class S>
-  using apply =
+  struct apply :
     build_unary_item_impl<
       boost::mpl::front<S>,
       boost::mpl::back<S>::type::value
-    >;
+    >
+  {};
 };
 
 struct build_reg_exp
@@ -63,7 +64,7 @@ struct build_reg_exp
   typedef build_reg_exp type;
 
   template <class NewExp, class OldExp>
-  using apply = r_concat<OldExp, NewExp>;
+  struct apply : r_concat<OldExp, NewExp> {};
 };
 
 /*
