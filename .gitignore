@@ -1,0 +1,4 @@
+*.swp
+lab/*.o
+lab/*.d
+lab/lab?
