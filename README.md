@@ -2,7 +2,6 @@
 
 [![Build Status](
   https://secure.travis-ci.org/sabel83/metaparse_tutorial.png?branch=master
-  "Build Status"
 )](http://travis-ci.org/sabel83/metaparse_tutorial)
 
 This is a lab exercise for the Metaparse library. After completing it, you will
@@ -22,7 +21,41 @@ template metaprogramming as well for those who are not familiar with them. The
 goal here is not to master these things, but to know enough about them to
 complete the rest of the tutorial.
 
-## Lab environment:
+## Table of contents
+
+- [Lab environment](#lab-environment)
+- [Tutorial](#tutorial)
+    - [Setting up the working environment](#setting-up-the-working-environment)
+    - [Completing the exercises](#completing-the-exercises)
+    - [Learning some Boost.Xpressive](#learning-some-boostxpressive)
+        - [Static regexes in Boost.Xpressive](#static-regexes-in-boostxpressive)
+    - [Generating static regexes](#generating-static-regexes)
+        - [Template metaprogramming values](#template-metaprogramming-values)
+        - [Generalising `r_a`](#generalising-r_a)
+        - [Using classes as arguments](#using-classes-as-arguments)
+        - [Concatenation](#concatenation)
+        - [Summary](#summary)
+    - [Learning some template metaprogramming](#learning-some-template-metaprogramming)
+        - [Template metafunctions](#template-metafunctions)
+        - [Template metafunction classes](#template-metafunction-classes)
+    - [Building a parser for regular expressions](#building-a-parser-for-regular-expressions)
+        - [The grammar](#the-grammar)
+        - [The parsers](#the-parsers)
+        - [Parsing letters and digits](#parsing-letters-and-digits)
+        - [Implementing `item`](#implementing-item)
+        - [Implementing `unary_item`](#implementing-unary_item)
+            - [Sequences](#sequences)
+            - [Pattern matching](#pattern-matching)
+        - [Implementing `reg_exp`](#implementing-reg_exp)
+        - [Implementing `bracket_exp`](#implementing-bracket_exp)
+            - [Dealing with recursion](#dealing-with-recursion)
+        - [Turning the parser into a simple metafunction](#turning-the-parser-into-a-simple-metafunction)
+        - [Providing a clean interface](#providing-a-clean-interface)
+    - [Summary](#summary-1)
+- [Solutions to the exercises](#solutions-to-the-exercises)
+- [License](#license)
+
+## Lab environment
 
 To complete this lab you need the following tools in your working environment:
 

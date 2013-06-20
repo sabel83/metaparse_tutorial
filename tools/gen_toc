@@ -1,0 +1,105 @@
+#!/usr/bin/python
+
+# Copyright Abel Sinkovics (abel@sinkovics.hu)  2013.
+# Distributed under the Boost Software License, Version 1.0.
+#    (See accompanying file LICENSE_1_0.txt or copy at
+#          http://www.boost.org/LICENSE_1_0.txt)
+
+import re
+import sys
+import optparse
+
+def anchor(c):
+  if c == ' ':
+    return '-'
+  elif c in ['.', '`']:
+    return ''
+  else:
+    return c.lower()
+
+def index_anchor(a, n):
+  return '%s-%d' % (a, n)
+
+class Header:
+  def __init__(self, s, prev_anchors):
+    [pre, title] = s.split(' ', 1)
+    self.depth = len(pre) - 1
+    self.title = title.strip()
+    self.anchor = ''.join([anchor(c) for c in self.title])
+    if self.anchor in prev_anchors:
+      i = 1
+      while index_anchor(self.anchor, i) in prev_anchors:
+        i = i + 1
+      self.anchor = index_anchor(self.anchor, i)
+
+  def toc_line(self, indent):
+    return \
+      '%s- [%s](#%s)' % ('    ' * (self.depth+indent), self.title, self.anchor)
+
+def is_header(s):
+  return re.compile('^[#]+ ').search(s)
+
+def collect_headers(doc):
+  header_lines = [s for s in doc if is_header(s)]
+  headers = []
+  anchors = []
+  for s in header_lines:
+    h = Header(s, anchors)
+    headers.append(h)
+    anchors.append(h.anchor)
+  return headers
+
+def generate_toc(headers, toc_title):
+  return \
+    '\n'.join( \
+      [h.toc_line(-1) for h in headers if h.depth > 0 and h.title != toc_title]\
+    ) + '\n'
+
+def generate_doc(f, doc, toc_title):
+  in_toc = False
+  for s in doc:
+    if in_toc:
+      if is_header(s):
+        f.write(s)
+        in_toc = False
+    else:
+      f.write(s)
+      if is_header(s) and Header(s, []).title == toc_title:
+        in_toc = True
+        f.write('\n')
+        f.write(generate_toc(collect_headers(doc), toc_title))
+        f.write('\n')
+
+def main():
+  parser = optparse.OptionParser()
+  parser.add_option(
+    '-i', '--input',
+    action='store',
+    dest='input',
+    help='The file to process'
+  )
+  parser.add_option(
+    '-o', '--output',
+    action='store',
+    dest='output',
+    help='The file to write the result into. It defaults to the input file. To write output to stdout use: -'
+  )
+  
+  (options, args) = parser.parse_args()
+  if options.output == None:
+    options.output = options.input
+
+  if options.input == None:
+    parser.error('No input file specified')
+  else:
+    toc_title = 'Table of contents'
+    doc = open(options.input, 'r').readlines()
+    if options.output == '-':
+      f = sys.stdout
+    else:
+      f = open(options.output, 'w')
+    generate_doc(f, doc, toc_title)
+
+if __name__ == '__main__':
+  main()
+
