@@ -7,3 +7,7 @@ before_install:
 script:
   - cd lab
   - make
+  - make clean
+  - make remove_comments
+  - cp ../solution/* .
+  - make
