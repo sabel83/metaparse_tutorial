@@ -39,3 +39,12 @@ all : clean build
 
 -include $(DEPS)
 
+# Remove all comments from the test source files
+REMOVE_COMMENT_TARGETS = $(addprefix remove_comment_, $(CPPS))
+
+$(REMOVE_COMMENT_TARGETS) : remove_comment_% : %
+	sed -i 's/^\/\/\([ ]*&&\)/\1/' $<
+	sed -i 's/\/\*\|\*\///' $<
+
+remove_comments : $(REMOVE_COMMENT_TARGETS)
+
