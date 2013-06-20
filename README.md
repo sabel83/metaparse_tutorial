@@ -1,5 +1,10 @@
 # Metaparse tutorial
 
+[![Build Status](
+  https://secure.travis-ci.org/sabel83/metaparse_tutorial.png?branch=master
+  "Build Status"
+)](http://travis-ci.org/sabel83/metaparse_tutorial)
+
 This is a lab exercise for the Metaparse library. After completing it, you will
 see how you can use Metaparse to embed a DSL into C++.
 
