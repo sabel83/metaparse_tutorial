@@ -24,20 +24,26 @@ complete the rest of the tutorial.
 ## Table of contents
 
 - [Lab environment](#lab-environment)
-- [Tutorial](#tutorial)
     - [Setting up the working environment](#setting-up-the-working-environment)
     - [Completing the exercises](#completing-the-exercises)
+- [Tutorial](#tutorial)
     - [Learning some Boost.Xpressive](#learning-some-boostxpressive)
+        - [Dynamic regexes](#dynamic-regexes)
+        - [Lab 1](#lab-1)
         - [Static regexes in Boost.Xpressive](#static-regexes-in-boostxpressive)
+        - [Lab 2](#lab-2)
     - [Generating static regexes](#generating-static-regexes)
         - [Template metaprogramming values](#template-metaprogramming-values)
         - [Generalising `r_a`](#generalising-r_a)
         - [Using classes as arguments](#using-classes-as-arguments)
         - [Concatenation](#concatenation)
         - [Summary](#summary)
+        - [Lab 3](#lab-3)
     - [Learning some template metaprogramming](#learning-some-template-metaprogramming)
         - [Template metafunctions](#template-metafunctions)
+        - [Lab 4](#lab-4)
         - [Template metafunction classes](#template-metafunction-classes)
+        - [Lab 5](#lab-5)
     - [Building a parser for regular expressions](#building-a-parser-for-regular-expressions)
         - [The grammar](#the-grammar)
         - [The parsers](#the-parsers)
@@ -51,6 +57,7 @@ complete the rest of the tutorial.
             - [Dealing with recursion](#dealing-with-recursion)
         - [Turning the parser into a simple metafunction](#turning-the-parser-into-a-simple-metafunction)
         - [Providing a clean interface](#providing-a-clean-interface)
+        - [Lab 6](#lab-6)
     - [Summary](#summary-1)
 - [Solutions to the exercises](#solutions-to-the-exercises)
 - [License](#license)
@@ -64,8 +71,6 @@ To complete this lab you need the following tools in your working environment:
 * The Boost libraries
 * GNU Make
 * Git
-
-## Tutorial
 
 ### Setting up the working environment
 
@@ -103,7 +108,11 @@ out. Once you have implemented a lab or part of it, you can uncomment a test
 and try building the project. You should not make any changes to the `.cpp`
 files other than removing comments.
 
+## Tutorial
+
 ### Learning some Boost.Xpressive
+
+#### Dynamic regexes
 
 As this tutorial builds a new interface for Boost.Xpressive, you need to have
 some Boost.Xpressive knowledge. Here is a simple example using Boost.Xpressive:
@@ -135,6 +144,8 @@ This example defines a regular expression object, `re`, initialises it with the
 regular expression `ab*c` and tries to match it to the string `abbbbbbbc`. To
 get the `sregex` and `smatch` types, the example included
 `boost/xpressive/xpressive.hpp`.
+
+#### Lab 1
 
 It is time to complete the first lab. Take a look at `lab1.cpp`, which assumes
 that a number of regular expression objects (`regex_`...) are defined and tests
@@ -214,6 +225,8 @@ of the regular expression using `sregex::compile` and uses it in the
 construction of the otherwise static regular expression. This can be used to
 create an empty regular expression: `sregex::compile("")`, which we will need
 later.
+
+#### Lab 2
 
 Take a look at `lab2.cpp` and `lab2.hpp` - they are the same as `lab1.cpp` and
 `lab1.hpp` were. You need to complete the same exercise again, but this time
@@ -520,6 +533,8 @@ expressions are hardly readable, but they can be constructed by instantiating
 template classes with classes as their arguments - things that template
 metaprograms can also do.
 
+#### Lab 3
+
 Thus, as a first step of implementing the DSL for regular expressions, you need
 to build these classes representing regular expressions. This is what you do in
 lab 3. Take a look at `lab3.cpp`. It tests regular expressions built using these
@@ -633,6 +648,8 @@ Now `add_cv` inherits from `add_volatile`. When someone tries accessing
 `add_cv<...>::type`, he will access `add_volatile<...>::type`, but that is fine.
 That is exactly what the first version of `add_cv` did as well. This technique
 is called *metafunction forwarding* and it makes the code more compact.
+
+#### Lab 4
 
 Now as you know what template metafunctions are, you should try writing one
 yourself. Take a look at `lab4.cpp` and `lab4.hpp`. In this exercise you need to
@@ -772,6 +789,8 @@ struct add_const
 This implementation has a `::type` pointing to itself to make it a template
 metaprogramming value and a metafunction called `::apply` to make it a
 template metafunction class.
+
+#### Lab 5
 
 Take a look at `lab5.cpp`. It is similar to `lab4.cpp`, you will have to
 implement the same `beginning_and_end` function, but this time you will have to
@@ -1341,6 +1360,8 @@ int main()
 This code contains the regular expression in its common form, thus anyone can
 easily read and update it, but this regular expression is verified and processed
 at compile-time.
+
+#### Lab 6
 
 Look at `lab6.cpp` and `lab6.hpp`. You will need to build all these things
 yourself. One your code passes all the validation, congratulations, you have
