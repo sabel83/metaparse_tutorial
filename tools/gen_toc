@@ -68,15 +68,17 @@ def generate_doc(f, doc, toc_title, toc_type):
         f.write(s)
         in_toc = False
     else:
-      f.write(s)
       if is_header(s) and Header(s, [], toc_type).title == toc_title:
         in_toc = True
-        f.write('\n')
-        f.write(generate_toc(collect_headers(doc, toc_type), toc_title))
-        f.write('\n')
+        if toc_type != 'none':
+          f.write(s + '\n')
+          f.write(generate_toc(collect_headers(doc, toc_type), toc_title))
+          f.write('\n')
+      else:
+        f.write(s)
 
 def main():
-  accepted_types = ['github', 'pandoc_html']
+  accepted_types = ['github', 'pandoc_html', 'none']
   parser = optparse.OptionParser()
   parser.add_option(
     '-i', '--input',
