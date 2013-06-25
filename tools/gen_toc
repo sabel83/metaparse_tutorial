@@ -9,10 +9,15 @@ import re
 import sys
 import optparse
 
-def anchor(c):
+def anchor(c, toc_type):
   if c == ' ':
     return '-'
-  elif c in ['.', '`']:
+  if c == '.':
+    if toc_type == 'pandoc_html':
+      return '.'
+    else:
+      return ''
+  elif c == '`':
     return ''
   else:
     return c.lower()
@@ -21,11 +26,11 @@ def index_anchor(a, n):
   return '%s-%d' % (a, n)
 
 class Header:
-  def __init__(self, s, prev_anchors):
+  def __init__(self, s, prev_anchors, toc_type):
     [pre, title] = s.split(' ', 1)
     self.depth = len(pre) - 1
     self.title = title.strip()
-    self.anchor = ''.join([anchor(c) for c in self.title])
+    self.anchor = ''.join([anchor(c, toc_type) for c in self.title])
     if self.anchor in prev_anchors:
       i = 1
       while index_anchor(self.anchor, i) in prev_anchors:
@@ -39,12 +44,12 @@ class Header:
 def is_header(s):
   return re.compile('^[#]+ ').search(s)
 
-def collect_headers(doc):
+def collect_headers(doc, toc_type):
   header_lines = [s for s in doc if is_header(s)]
   headers = []
   anchors = []
   for s in header_lines:
-    h = Header(s, anchors)
+    h = Header(s, anchors, toc_type)
     headers.append(h)
     anchors.append(h.anchor)
   return headers
@@ -55,7 +60,7 @@ def generate_toc(headers, toc_title):
       [h.toc_line(-1) for h in headers if h.depth > 0 and h.title != toc_title]\
     ) + '\n'
 
-def generate_doc(f, doc, toc_title):
+def generate_doc(f, doc, toc_title, toc_type):
   in_toc = False
   for s in doc:
     if in_toc:
@@ -64,13 +69,14 @@ def generate_doc(f, doc, toc_title):
         in_toc = False
     else:
       f.write(s)
-      if is_header(s) and Header(s, []).title == toc_title:
+      if is_header(s) and Header(s, [], toc_type).title == toc_title:
         in_toc = True
         f.write('\n')
-        f.write(generate_toc(collect_headers(doc), toc_title))
+        f.write(generate_toc(collect_headers(doc, toc_type), toc_title))
         f.write('\n')
 
 def main():
+  accepted_types = ['github', 'pandoc_html']
   parser = optparse.OptionParser()
   parser.add_option(
     '-i', '--input',
@@ -84,6 +90,14 @@ def main():
     dest='output',
     help='The file to write the result into. It defaults to the input file. To write output to stdout use: -'
   )
+  parser.add_option(
+    '-t', '--type',
+    action='store',
+    dest='type',
+    default='github',
+    help='Type of TOC. Possible values: %s. Default: %s'
+      % (', '.join(accepted_types), 'github')
+  )
   
   (options, args) = parser.parse_args()
   if options.output == None:
@@ -91,6 +105,8 @@ def main():
 
   if options.input == None:
     parser.error('No input file specified')
+  elif not options.type in accepted_types:
+    parser.error('Invalid type: %s' % (options.type))
   else:
     toc_title = 'Table of contents'
     doc = open(options.input, 'r').readlines()
@@ -98,7 +114,7 @@ def main():
       f = sys.stdout
     else:
       f = open(options.output, 'w')
-    generate_doc(f, doc, toc_title)
+    generate_doc(f, doc, toc_title, options.type)
 
 if __name__ == '__main__':
   main()
