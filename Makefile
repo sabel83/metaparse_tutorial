@@ -3,31 +3,20 @@
 #    (See accompanying file LICENSE_1_0.txt or copy at
 #          http://www.boost.org/LICENSE_1_0.txt)
 
-GEN_TOC = tools/gen_toc
-DST = html
-TOC ?= generate
+all : README.md test
 
-PNG_SRC = $(wildcard gfx/*.png)
-PNG_DST = $(patsubst gfx/%,html/%, $(PNG_SRC))
+README.md : doc/README.md
+	doc/tools/gen_toc -i $< -o $@ -t github
 
-ifeq ($(TOC), generate)
-  TOC_STYLE = pandoc_html
-else
-  TOC_STYLE = none
-endif
+html :
+	$(MAKE) -C doc html
 
-html : $(DST)/index.html
-
-$(PNG_DST) : html/% : gfx/%
-	cp $< $@
-
-$(DST)/index.html : README.md $(PNG_DST)
-	$(GEN_TOC) -i $< -o - -t $(TOC_STYLE) \
-	| grep -v secure.travis-ci.org \
-        | sed 's/^[#] /% /' \
-	| sed 's/https:\/\/raw\.github\.com\/sabel83\/metaparse_tutorial\/master\/gfx\///' \
-	| pandoc --from markdown --to html -c style.css -o $@
 
 clean :
-	-rm $(DST)/index.html $(PNG_DST)
+	$(MAKE) -C doc clean
+	$(MAKE) -C lab clean
+
+test :
+	$(MAKE) -C lab test
+
 
