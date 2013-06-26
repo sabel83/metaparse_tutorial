@@ -11,7 +11,7 @@
 boost::xpressive::sregex
 
   // ""
-    regex_ = boost::xpressive::sregex::compile("")
+    regex_ = boost::xpressive::nil
 
   // "a"
   , regex_a = boost::xpressive::as_xpr('a')

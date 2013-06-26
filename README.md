@@ -216,13 +216,10 @@ following way:
 > the value `'a'` by `'b'`. This tutorial will always use `as_xpr` to make
 > things explicit and easy to follow.
 
-Dynamic and static regular expressions can be combined. For example the above
-regular expression can be created the following way too:
-`as_xpr('a') >> *as_xpr('b') >> sregex::compile("c")`. It creates the `c` part
-of the regular expression using `sregex::compile` and uses it in the
-construction of the otherwise static regular expression. This can be used to
-create an empty regular expression: `sregex::compile("")`, which we will need
-later.
+There is an important regular expression you will need: the empty regular
+expression. As a dynamic regular expression, you can create it by
+`sregex::compile("")`. This has a static version as well, which is
+`boost::xpressive::nil`.
 
 #### Lab 2
 

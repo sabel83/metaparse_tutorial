@@ -19,7 +19,7 @@ struct r_empty
 
   static boost::xpressive::sregex run()
   {
-    return boost::xpressive::sregex::compile("");
+    return boost::xpressive::nil;
   }
 };
 
