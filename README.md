@@ -32,9 +32,13 @@ complete the rest of the tutorial.
         - [Lab 2](#lab-2)
     - [Generating static regexes](#generating-static-regexes)
         - [Template metaprogramming values](#template-metaprogramming-values)
+        - [Making `r_a` efficient](#making-r_a-efficient)
         - [Generalising `r_a`](#generalising-r_a)
         - [Using classes as arguments](#using-classes-as-arguments)
         - [Concatenation](#concatenation)
+            - [Representing concatenation](#representing-concatenation)
+            - [Using `r_concat`](#using-r_concat)
+            - [Temporary objects](#temporary-objects)
         - [Summary](#summary)
         - [Lab 3](#lab-3)
     - [Learning some template metaprogramming](#learning-some-template-metaprogramming)
@@ -165,7 +169,7 @@ widely used and known syntax. The problem with this approach is that the library
 does not look into the string literals until runtime. No typos or other errors
 are detected until runtime and there is no chance of optimisation either.
 
-Another approach Boost.Xpressive offers is called `static regexes`. The idea
+Another approach Boost.Xpressive offers is called *static regexes*. The idea
 here is that valid C++ expressions can be interpreted as regular expressions.
 For example:
 
@@ -314,6 +318,76 @@ regular expression `a` but how this approach can be used in a real solution?
 Before moving on, you need to get familiar with how regular expressions can be
 represented as classes.
 
+#### Making `r_a` efficient
+
+The `r_a` we have built so far builds a static regular expression from the `'a'`
+character and returns it as an `sregex` object. The type of `as_xpr('a')` is not
+`sregex` -  it can be converted into that. But code calling `r_a::run()` will
+not be able to find out the real type of the returned object. As both the
+original type and `sregex` represent regular expressions, the caller of `run`
+will be able to deal with this. However, turning `as_xpr('a')` into an `sregex`
+object comes with runtime costs and we want our library to be efficient. Thus,
+we should keep the original type of `as_xpr('a')` and implement `r_a` the
+following way:
+
+```cpp
+struct r_a
+{
+  typedef r_a type;
+
+  static <<<type of as_xpr('a') goes here>>> run()
+  {
+    return xpressive::as_xpr('a');
+  }
+};
+```
+
+The return type of the above `run` function is the type of `as_xpr('a')` - at
+least that is what we want to achieve. But what is the type of `as_xpr('a')`?
+C++ provides us a way of implementing the above code *without knowing the type
+of `as_xpr('a')`*: `decltype(as_xpr('a'))` means *the type `as_xpr('a')`
+returns*. Using it, we can implement the efficient version of `r_a`:
+
+```cpp
+struct r_a
+{
+  typedef r_a type;
+
+  static decltype(xpressive::as_xpr('a')) run()
+  {
+    return xpressive::as_xpr('a');
+  }
+};
+```
+
+The return type of this version of `run` is the same as the return type of
+`as_xpr`, even though we don't know this type. We don't need to know it, the
+compiler knows and can use it.
+
+> Note: the above code has to repeat the expression it returns twice: once
+> for figuring out the type of this expression and once for really returning it.
+> Using a macro similar to the one Dave Abrahams suggested [here](
+>   http://cpp-next.com/archive/2011/11/having-it-all-pythy-syntax/comment-page-1/#comment-1833
+> ) can save us from writing that expression twice:
+> 
+> ```cpp
+> #define static RUN(...) decltype(__VA_ARGS__) run() { return (__VA_ARGS__); }
+> ```
+> This macro takes the expression to return as argument and defines the `run`
+> function. Using it, `r_a` can be implemented the following way:
+> 
+> ```cpp
+> struct r_a
+> {
+>   typedef r_a type;
+> 
+>   RUN(xpressive::as_xpr('a'))
+> };
+> ```
+> 
+> This code contains the expression to return only once and uses the
+> preprocessor to duplicate it and generate code the compiler expects.
+
 #### Generalising `r_a`
 
 As a first step, `r_a` can be generalised. Instead of having a class
@@ -327,7 +401,7 @@ struct r_char
 {
   typedef r_char type;
 
-  static xpressive::sregex run()
+  static decltype(boost::xpressive::as_xpr(C)) run()
   {
     return boost::xpressive::as_xpr(C);
   }
@@ -383,7 +457,7 @@ struct r_char
 {
   typedef r_char type;
 
-  static xpressive::sregex run()
+  static decltype(boost::xpressive::as_xpr(C::type::value)) run()
   {
     return boost::xpressive::as_xpr(C::type::value);
   }
@@ -405,20 +479,22 @@ http://abel.web.elte.hu/mpllibs/metamonad/manual.html#_lazy_metafunctions
 
 #### Concatenation
 
+##### Representing concatenation
+
 We can represent simple regular expressions by classes. Now let's try to do
 something more complex, such as representing the regular expression `ab` as a
 class. This regular expression can be constructed by concatenating the regular
 expressions `a` and `b`:
 
 ```cpp
+using boost::xpressive::as_xpr;
+
 struct r_ab
 {
   typedef r_ab type;
 
-  static xpressive::sregex run()
+  static decltype(as_xpr('a') >> as_xpr('b')) run()
   {
-    using boost::xpressive::as_xpr;
-
     return as_xpr('a') >> as_xpr('b');
   }
 };
@@ -431,15 +507,15 @@ matching object of the regular expressions `a` and `b` can be constructed using
 the instances of the `r_char` template class, so let's use that:
 
 ```cpp
+using boost::mpl::char_;
+
 struct r_ab
 {
   typedef r_ab type;
 
-  static xpressive::sregex run()
+  static decltype(r_char<char_<'a'>>::run() >> r_char<char_<'b'>>::run()) run()
   {
-    using boost::mpl::char_;
-
-    return r_char<char_<'a'>>::run() >> r_char<char<'b'>>::run();
+    return r_char<char_<'a'>>::run() >> r_char<char_<'b'>>::run();
   }
 };
 ```
@@ -457,7 +533,7 @@ struct r_concat
 {
   typedef r_concat type;
 
-  static xpressive::sregex run()
+  static decltype(A::run() >> B::run()) run()
   {
     return A::run() >> B::run();
   }
@@ -478,7 +554,7 @@ struct r_concat
 {
   typedef r_concat type;
 
-  static xpressive::sregex run()
+  static decltype(A::type::run() >> B::type::run()) run()
   {
     return A::type::run() >> B::type::run();
   }
@@ -487,7 +563,10 @@ struct r_concat
 
 This code does the same as the previous one, but instead of calling `::run()` of
 its arguments, it calls `::type::run()` to work better with lazy metaprograms.
-This template class can be used to represent `r_ab`:
+
+##### Using `r_concat`
+
+`r_concat` can be used to represent `r_ab`:
 
 ```cpp
 typedef
@@ -519,6 +598,88 @@ This code uses `r_concat` twice: it builds the type representing the regular
 expression `ab` by concatenating the types representing the regular expressions
 `a` and `b` and then it concatenates this type with the type representing the
 regular expression `c`.
+
+##### Temporary objects
+
+What we have built so far seems to be correct. If we try using it, our code will
+compile but will crash at runtime. The reason behind that is that the expression
+`A::type::run()` returns a temporary object. The `>>` operator creates a new
+object that references this temporary (and the result of `B::type::run()` as
+well) and that is the problem. The temporary objects are destroyed by the time
+we return from `r_concat::run` - but we return a new object we have just created
+using the `>>` operator. And this new object refers to the temporaries that are
+already destroyed.
+
+The following diagrams illustrate the problem. First `r_concat::run()` calls
+`A::type::run()` and `B::type::run()` to build the two regular expressions to be
+concatenated:
+
+![Calling the two regular expressions to be concatenated](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/r_concat1.png
+)
+
+The two regular expression objects to be concatenated a represented as `regex A`
+and `regex B`. As the next step, `r_concat::run()` concatenates them using 
+`operator>>`:
+
+![Concatenating the regular expressions](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/r_concat2.png
+)
+
+The resulting regular expression object (`regex AB`) contains references to the
+original objects we have concatenated. `r_concat::run()` returns this object:
+
+![Returning the result](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/r_concat3.png
+)
+
+The problem here is that the temporary objects, `regex A` and `regex B` are
+destroyed, but the object returned still references them.
+
+This problem can be avoided by making a copy of the temporaries. Boost.Proto
+(the library used by Xpressive) provides a tool for this:
+`boost::proto::deep_copy`. It can take the object created by the `>>` operator
+and make a copy of it. This makes a copy of the temporaries as well, thus it
+will fix the above problem. It can be used the following way:
+
+```cpp
+using boost::proto::deep_copy;
+
+template <class A, class B>
+struct r_concat
+{
+  typedef r_concat type;
+
+  static decltype(deep_copy(A::type::run() >> B::type::run())) run()
+  {
+    return deep_copy(A::type::run() >> B::type::run());
+  }
+};
+```
+
+This code makes a copy of the result of the `>>` operator. This is a deep copy,
+thus everything being referred to is also copied. This way the resulting object
+does not refer to any temporary and will not crash at runtime. The following
+diagrams illustrate how `deep_copy` works:
+
+![Calling deep_copy](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/r_concat4.png
+)
+
+`deep_copy` made a copy of the object `operator>>` created and this copy
+contains a copy of `regex A` and `regex B`, thus the original temporary objects
+are not referenced by this. `r_concat::run()` can safely return it:
+
+![Returning the result of deep_copy](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/gfx/r_concat5.png
+)
+
+Returning the copy of `regex AB` containing all of its references does not cause
+issues, since it does not refer to any already destroyed object.
+
+Every time you write a `run` function building a new regular expression object
+out of an existing one (and you will be doing that several times in the lab),
+you will need to use `deep_copy` to avoid this problem.
 
 #### Summary
 

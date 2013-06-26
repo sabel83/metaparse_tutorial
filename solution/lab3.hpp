@@ -8,19 +8,23 @@
 
 #include <boost/xpressive/xpressive.hpp>
 
+#include <boost/proto/deep_copy.hpp>
+
 /*
  * Elements to build the regular expressions from
  */
+
+#ifdef RUN
+  #error RUN already defined
+#endif
+#define RUN(...) static decltype(__VA_ARGS__) run() { return (__VA_ARGS__); }
 
 // Empty regular expression
 struct r_empty
 {
   typedef r_empty type;
 
-  static boost::xpressive::sregex run()
-  {
-    return boost::xpressive::nil;
-  }
+  RUN(boost::xpressive::nil)
 };
 
 // Matches any character (.)
@@ -28,10 +32,7 @@ struct r_dot
 {
   typedef r_dot type;
 
-  static auto run() -> decltype(boost::xpressive::_)
-  {
-    return boost::xpressive::_;
-  }
+  RUN(boost::xpressive::_)
 };
 
 // Matches repetitions (E*)
@@ -40,10 +41,7 @@ struct r_star
 {
   typedef r_star type;
 
-  static boost::xpressive::sregex run()
-  {
-    return *E::type::run();
-  }
+  RUN(boost::proto::deep_copy(*E::type::run()))
 };
 
 // Concatenates two regular expressions (AB)
@@ -52,10 +50,7 @@ struct r_concat
 {
   typedef r_concat type;
 
-  static boost::xpressive::sregex run()
-  {
-    return A::type::run() >> B::type::run();
-  }
+  RUN(boost::proto::deep_copy(A::type::run() >> B::type::run()))
 };
 
 // Matches one specific character (C)
@@ -64,11 +59,11 @@ struct r_char
 {
   typedef r_char type;
 
-  static boost::xpressive::sregex run()
-  {
-    return boost::xpressive::as_xpr(C::type::value);
-  }
+  RUN(boost::xpressive::as_xpr(C::type::value))
 };
+
+// Used by this header only
+#undef RUN
 
 #endif
 
