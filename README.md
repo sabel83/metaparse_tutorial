@@ -32,7 +32,6 @@ complete the rest of the tutorial.
         - [Lab 2](#lab-2)
     - [Generating static regexes](#generating-static-regexes)
         - [Template metaprogramming values](#template-metaprogramming-values)
-        - [Making `r_a` efficient](#making-r_a-efficient)
         - [Generalising `r_a`](#generalising-r_a)
         - [Using classes as arguments](#using-classes-as-arguments)
         - [Concatenation](#concatenation)
@@ -265,7 +264,7 @@ can be a class with a static method that builds some object - for example an
 ```cpp
 struct r_a
 {
-  static xpressive::sregex run()
+  static <<< type of xpressive::as_xpr('a') goes here >>> run()
   {
     return xpressive::as_xpr('a');
   }
@@ -274,8 +273,47 @@ struct r_a
 
 This class, `r_a` has a public static `run()` method. When this `run()` method
 is called, it builds a matching object for the regular expression `a`. As `r_a`
-is a class, it could be the result of a template metaprogram. So the process of
-turning a string literal into a matching object is the following:
+is a class, it could be the result of a template metaprogram. The only thing
+missing from the above piece of code is the return type of `run()`, which is the
+type of the expression we are returning. This can be implemented the following
+way:
+
+```cpp
+struct r_a
+{
+  static decltype(xpressive::as_xpr('a')) run()
+  {
+    return xpressive::as_xpr('a');
+  }
+};
+```
+
+`decltype(...)` means *the return type of the `...` expression*. The above code
+has to repeat the expression it returns twice: once for figuring out the type of
+this expression and once for really returning it. Using a macro similar to the
+one Dave Abrahams suggested [here](
+http://cpp-next.com/archive/2011/11/having-it-all-pythy-syntax/comment-page-1/#comment-1833
+) can save us from writing that expression twice:
+
+```cpp
+#define static RUN(...) \
+  decltype(__VA_ARGS__) run() { return (__VA_ARGS__); }
+```
+This macro takes the expression to return as argument and defines the `run`
+function. Using it, `r_a` can be implemented the following way:
+
+```cpp
+struct r_a
+{
+  RUN(xpressive::as_xpr('a'))
+};
+```
+
+This code contains the expression to return only once and uses the
+preprocessor to duplicate it and generate code the compiler expects.
+
+So the process of turning a string literal into a matching object is the
+following:
 
 ![Turning a string literal into a matching object](
   https://raw.github.com/sabel83/metaparse_tutorial/master/doc/html/r_a.png
@@ -301,10 +339,7 @@ struct r_a
 {
   typedef r_a type;
 
-  static xpressive::sregex run()
-  {
-    return xpressive::as_xpr('a');
-  }
+  RUN(xpressive::as_xpr('a'))
 };
 ```
 
@@ -317,76 +352,6 @@ We have seen how to create a class representing the matching object of the
 regular expression `a` but how this approach can be used in a real solution?
 Before moving on, you need to get familiar with how regular expressions can be
 represented as classes.
-
-#### Making `r_a` efficient
-
-The `r_a` we have built so far builds a static regular expression from the `'a'`
-character and returns it as an `sregex` object. The type of `as_xpr('a')` is not
-`sregex` -  it can be converted into that. But code calling `r_a::run()` will
-not be able to find out the real type of the returned object. As both the
-original type and `sregex` represent regular expressions, the caller of `run`
-will be able to deal with this. However, turning `as_xpr('a')` into an `sregex`
-object comes with runtime costs and we want our library to be efficient. Thus,
-we should keep the original type of `as_xpr('a')` and implement `r_a` the
-following way:
-
-```cpp
-struct r_a
-{
-  typedef r_a type;
-
-  static <<<type of as_xpr('a') goes here>>> run()
-  {
-    return xpressive::as_xpr('a');
-  }
-};
-```
-
-The return type of the above `run` function is the type of `as_xpr('a')` - at
-least that is what we want to achieve. But what is the type of `as_xpr('a')`?
-C++ provides us a way of implementing the above code *without knowing the type
-of `as_xpr('a')`*: `decltype(as_xpr('a'))` means *the type `as_xpr('a')`
-returns*. Using it, we can implement the efficient version of `r_a`:
-
-```cpp
-struct r_a
-{
-  typedef r_a type;
-
-  static decltype(xpressive::as_xpr('a')) run()
-  {
-    return xpressive::as_xpr('a');
-  }
-};
-```
-
-The return type of this version of `run` is the same as the return type of
-`as_xpr`, even though we don't know this type. We don't need to know it, the
-compiler knows and can use it.
-
-> Note: the above code has to repeat the expression it returns twice: once
-> for figuring out the type of this expression and once for really returning it.
-> Using a macro similar to the one Dave Abrahams suggested [here](
->   http://cpp-next.com/archive/2011/11/having-it-all-pythy-syntax/comment-page-1/#comment-1833
-> ) can save us from writing that expression twice:
-> 
-> ```cpp
-> #define static RUN(...) decltype(__VA_ARGS__) run() { return (__VA_ARGS__); }
-> ```
-> This macro takes the expression to return as argument and defines the `run`
-> function. Using it, `r_a` can be implemented the following way:
-> 
-> ```cpp
-> struct r_a
-> {
->   typedef r_a type;
-> 
->   RUN(xpressive::as_xpr('a'))
-> };
-> ```
-> 
-> This code contains the expression to return only once and uses the
-> preprocessor to duplicate it and generate code the compiler expects.
 
 #### Generalising `r_a`
 
@@ -401,10 +366,7 @@ struct r_char
 {
   typedef r_char type;
 
-  static decltype(boost::xpressive::as_xpr(C)) run()
-  {
-    return boost::xpressive::as_xpr(C);
-  }
+  RUN(boost::xpressive::as_xpr(C))
 };
 ```
 
@@ -457,10 +419,7 @@ struct r_char
 {
   typedef r_char type;
 
-  static decltype(boost::xpressive::as_xpr(C::type::value)) run()
-  {
-    return boost::xpressive::as_xpr(C::type::value);
-  }
+  RUN(boost::xpressive::as_xpr(C::type::value))
 };
 ```
 
@@ -493,10 +452,7 @@ struct r_ab
 {
   typedef r_ab type;
 
-  static decltype(as_xpr('a') >> as_xpr('b')) run()
-  {
-    return as_xpr('a') >> as_xpr('b');
-  }
+  RUN(as_xpr('a') >> as_xpr('b'))
 };
 ```
 
@@ -513,10 +469,7 @@ struct r_ab
 {
   typedef r_ab type;
 
-  static decltype(r_char<char_<'a'>>::run() >> r_char<char_<'b'>>::run()) run()
-  {
-    return r_char<char_<'a'>>::run() >> r_char<char_<'b'>>::run();
-  }
+  RUN(r_char<char_<'a'>>::run() >> r_char<char_<'b'>>::run())
 };
 ```
 
@@ -533,10 +486,7 @@ struct r_concat
 {
   typedef r_concat type;
 
-  static decltype(A::run() >> B::run()) run()
-  {
-    return A::run() >> B::run();
-  }
+  RUN(A::run() >> B::run())
 };
 ```
 
@@ -554,10 +504,7 @@ struct r_concat
 {
   typedef r_concat type;
 
-  static decltype(A::type::run() >> B::type::run()) run()
-  {
-    return A::type::run() >> B::type::run();
-  }
+  RUN(A::type::run() >> B::type::run())
 };
 ```
 
@@ -650,10 +597,7 @@ struct r_concat
 {
   typedef r_concat type;
 
-  static decltype(deep_copy(A::type::run() >> B::type::run())) run()
-  {
-    return deep_copy(A::type::run() >> B::type::run());
-  }
+  RUN(deep_copy(A::type::run() >> B::type::run()))
 };
 ```
 
