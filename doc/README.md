@@ -23,6 +23,12 @@ complete the rest of the tutorial.
 
 This is automatically generated. Do not write anything here.
 
+## Slides
+
+A slidehsow presenting this tutorial is available in [PDF](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/doc/pdf/slides.pdf
+) format.
+
 ## Lab environment
 
 To complete this lab you need the following tools in your working environment:

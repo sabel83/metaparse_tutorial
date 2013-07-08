@@ -21,6 +21,7 @@ complete the rest of the tutorial.
 
 ## Table of contents
 
+- [Slides](#slides)
 - [Lab environment](#lab-environment)
     - [Setting up the working environment](#setting-up-the-working-environment)
     - [Completing the exercises](#completing-the-exercises)
@@ -63,6 +64,12 @@ complete the rest of the tutorial.
 - [Solutions to the exercises](#solutions-to-the-exercises)
 - [Acknowledgement](#acknowledgement)
 - [License](#license)
+
+## Slides
+
+A slidehsow presenting this tutorial is available in [PDF](
+  https://raw.github.com/sabel83/metaparse_tutorial/master/doc/pdf/slides.pdf
+) format.
 
 ## Lab environment
 
