@@ -61,6 +61,7 @@ complete the rest of the tutorial.
         - [Lab 6](#lab-6)
     - [Summary](#summary-1)
 - [Solutions to the exercises](#solutions-to-the-exercises)
+- [Acknowledgement](#acknowledgement)
 - [License](#license)
 
 ## Lab environment
@@ -1479,6 +1480,11 @@ the same time.
 
 You can find the solutions of the exercises in the `solution` directory of the
 source code you have downloaded.
+
+## Acknowledgement
+
+I would like to thank Eric Niebler for reviewing this tutorial and giving
+valuable feedback.
 
 ## License
 

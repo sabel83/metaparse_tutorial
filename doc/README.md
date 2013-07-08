@@ -1440,6 +1440,11 @@ the same time.
 You can find the solutions of the exercises in the `solution` directory of the
 source code you have downloaded.
 
+## Acknowledgement
+
+I would like to thank Eric Niebler for reviewing this tutorial and giving
+valuable feedback.
+
 ## License
 
 The tutorial is published under the
