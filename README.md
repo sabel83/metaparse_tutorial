@@ -304,8 +304,8 @@ http://cpp-next.com/archive/2011/11/having-it-all-pythy-syntax/comment-page-1/#c
 ) can save us from writing that expression twice:
 
 ```cpp
-#define static RUN(...) \
-  decltype(__VA_ARGS__) run() { return (__VA_ARGS__); }
+#define RUN(...) \
+  static decltype(__VA_ARGS__) run() { return (__VA_ARGS__); }
 ```
 This macro takes the expression to return as argument and defines the `run`
 function. Using it, `r_a` can be implemented the following way:
