@@ -606,8 +606,7 @@ to build these classes representing regular expressions. This is what you do in
 lab 3. Take a look at `lab3.cpp`. It tests regular expressions built using these
 classes. In `lab3.hpp` you need to implement these classes yourself:
 
-* `r_empty`: it's run should return an empty regular expression. Hint: you may
-  use `sregex::compile` here.
+* `r_empty`: it's run should return an empty regular expression.
 * `r_dot`: it's run should return a regular expression matching any character.
   This class represents the regular expression `.`
 * `r_star`: this represents the `*` element of regular expressions.
