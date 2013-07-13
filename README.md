@@ -87,7 +87,7 @@ First you need to clone the tutorial's Git repository somewhere to set the lab
 environment up. You can do it by running the following command:
 
 ```bash
-git clone https://github.com/sabel83/metaparse_tutorial
+git clone https://github.com/sabel83/metaparse_tutorial.git
 ```
 
 This will create the directory `metaparse_tutorial` for you which you should go
