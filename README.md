@@ -26,12 +26,11 @@ complete the rest of the tutorial.
     - [Setting up the working environment](#setting-up-the-working-environment)
     - [Completing the exercises](#completing-the-exercises)
 - [Tutorial](#tutorial)
-    - [Learning some Boost.Xpressive](#learning-some-boostxpressive)
-        - [Dynamic regexes](#dynamic-regexes)
-        - [Lab 1](#lab-1)
-        - [Static regexes in Boost.Xpressive](#static-regexes-in-boostxpressive)
-        - [Lab 2](#lab-2)
-    - [Generating static regexes](#generating-static-regexes)
+    - [Lab 1: Dynamic regexes in Boost.Xpressive](#lab-1:-dynamic-regexes-in-boostxpressive)
+        - [Exercise of lab 1](#exercise-of-lab-1)
+    - [Lab 2: Static regexes in Boost.Xpressive](#lab-2:-static-regexes-in-boostxpressive)
+        - [Exercise of lab 2](#exercise-of-lab-2)
+    - [Lab 3: Generating static regexes](#lab-3:-generating-static-regexes)
         - [Template metaprogramming values](#template-metaprogramming-values)
         - [Generalising `r_a`](#generalising-r_a)
         - [Using classes as arguments](#using-classes-as-arguments)
@@ -40,13 +39,12 @@ complete the rest of the tutorial.
             - [Using `r_concat`](#using-r_concat)
             - [Temporary objects](#temporary-objects)
         - [Summary](#summary)
-        - [Lab 3](#lab-3)
-    - [Learning some template metaprogramming](#learning-some-template-metaprogramming)
-        - [Template metafunctions](#template-metafunctions)
-        - [Lab 4](#lab-4)
-        - [Template metafunction classes](#template-metafunction-classes)
-        - [Lab 5](#lab-5)
-    - [Building a parser for regular expressions](#building-a-parser-for-regular-expressions)
+        - [Exercise of lab 3](#exercise-of-lab-3)
+    - [Lab 4: Template metafunctions](#lab-4:-template-metafunctions)
+        - [Exercise of lab 4](#exercise-of-lab-4)
+    - [Lab 5: Template metafunction classes](#lab-5:-template-metafunction-classes)
+        - [Exercise of lab 5](#exercise-of-lab-5)
+    - [Lab 6: Building a parser for regular expressions](#lab-6:-building-a-parser-for-regular-expressions)
         - [The grammar](#the-grammar)
         - [The parsers](#the-parsers)
         - [Parsing letters and digits](#parsing-letters-and-digits)
@@ -59,7 +57,7 @@ complete the rest of the tutorial.
             - [Dealing with recursion](#dealing-with-recursion)
         - [Turning the parser into a simple metafunction](#turning-the-parser-into-a-simple-metafunction)
         - [Providing a clean interface](#providing-a-clean-interface)
-        - [Lab 6](#lab-6)
+        - [Exercise of lab 6](#exercise-of-lab-6)
     - [Summary](#summary-1)
 - [Solutions to the exercises](#solutions-to-the-exercises)
 - [Acknowledgement](#acknowledgement)
@@ -119,9 +117,7 @@ files other than removing comments.
 
 ## Tutorial
 
-### Learning some Boost.Xpressive
-
-#### Dynamic regexes
+### Lab 1: Dynamic regexes in Boost.Xpressive
 
 As this tutorial builds a new interface for Boost.Xpressive, you need to have
 some Boost.Xpressive knowledge. Here is a simple example using Boost.Xpressive:
@@ -154,7 +150,7 @@ regular expression `ab*c` and tries to match it to the string `abbbbbbbc`. To
 get the `sregex` and `smatch` types, the example included
 `boost/xpressive/xpressive.hpp`.
 
-#### Lab 1
+#### Exercise of lab 1
 
 It is time to complete the first lab. Take a look at `lab1.cpp`, which assumes
 that a number of regular expression objects (`regex_`...) are defined and tests
@@ -163,7 +159,7 @@ expression as argument and tries to match it to a number of strings. In
 `lab1.hpp` you need to define these regular expression objects. Once all of the
 validations in `lab1.cpp` pass, you can proceed.
 
-#### Static regexes in Boost.Xpressive
+### Lab 2: Static regexes in Boost.Xpressive
 
 We have embedded the regular expressions in the code as string literals. The
 library does not look into these string literals until runtime. When the
@@ -232,13 +228,13 @@ expression. As a dynamic regular expression, you can create it by
 `sregex::compile("")`. This has a static version as well, which is
 `boost::xpressive::nil`.
 
-#### Lab 2
+#### Exercise of lab 2
 
 Take a look at `lab2.cpp` and `lab2.hpp` - they are the same as `lab1.cpp` and
 `lab1.hpp` were. You need to complete the same exercise again, but this time
 using static regular expressions. Once all validations pass, you can continue.
 
-### Generating static regexes
+### Lab 3: Generating static regexes
 
 You are now familiar with the construction of static regexes using
 Boost.Xpressive. They are validated at compile-time and can be optimised,
@@ -641,7 +637,7 @@ expressions are hardly readable, but they can be constructed by instantiating
 template classes with classes as their arguments - things that template
 metaprograms can also do.
 
-#### Lab 3
+#### Exercise of lab 3
 
 Thus, as a first step of implementing the DSL for regular expressions, you need
 to build these classes representing regular expressions. This is what you do in
@@ -660,13 +656,11 @@ classes. In `lab3.hpp` you need to implement these classes yourself:
 classes. You need to implement them. Once all the validations succeed, you can
 continue this tutorial.
 
-### Learning some template metaprogramming
+### Lab 4: Template metafunctions
 
 Now we will learn some template metaprogramming. Don't worry, we will not go
 deeply into this topic. We will only cover things that you will need to complete
 this tutorial - and this is probably less than what you'd expect.
-
-#### Template metafunctions
 
 Template metafunctions are the basic building blocks of template metaprograms.
 They represent things that can be called at compile-time. They take types as
@@ -756,7 +750,7 @@ Now `add_cv` inherits from `add_volatile`. When someone tries accessing
 That is exactly what the first version of `add_cv` did as well. This technique
 is called *metafunction forwarding* and it makes the code more compact.
 
-#### Lab 4
+#### Exercise of lab 4
 
 Now as you know what template metafunctions are, you should try writing one
 yourself. Take a look at `lab4.cpp` and `lab4.hpp`. In this exercise you need to
@@ -776,7 +770,7 @@ You can take a look at the reference of [Boost.MPL](http://boost.org/libs/mpl)
 to see how these things work and how they can be used. Once your metafunction
 passes all the validations for this task, you can proceed.
 
-#### Template metafunction classes
+### Lab 5: Template metafunction classes
 
 We have seen how to write functions that can be called at compile-time. Now we
 will look at writing *higher order metafunctions*, which are metafunctions
@@ -897,14 +891,14 @@ This implementation has a `::type` pointing to itself to make it a template
 metaprogramming value and a metafunction called `::apply` to make it a
 template metafunction class.
 
-#### Lab 5
+#### Exercise of lab 5
 
 Take a look at `lab5.cpp`. It is similar to `lab4.cpp`, you will have to
 implement the same `beginning_and_end` function, but this time you will have to
 implement it as a template metafunction class. Once your code passes all the
 validations, you can continue this tutorial.
 
-### Building a parser for regular expressions
+### Lab 6: Building a parser for regular expressions
 
 We have everything to generate regular expressions from template metaprograms.
 We need to start writing the metaprograms turning string literals into regular
@@ -1468,7 +1462,7 @@ This code contains the regular expression in its common form, thus anyone can
 easily read and update it, but this regular expression is verified and processed
 at compile-time.
 
-#### Lab 6
+#### Exercise of lab 6
 
 Look at `lab6.cpp` and `lab6.hpp`. You will need to build all these things
 yourself. One your code passes all the validation, congratulations, you have
