@@ -18,6 +18,8 @@
 #include <mpllibs/metaparse/foldl.hpp>
 #include <mpllibs/metaparse/build_parser.hpp>
 #include <mpllibs/metaparse/string.hpp>
+#include <mpllibs/metaparse/sequence.hpp>
+#include <mpllibs/metaparse/return_.hpp>
 
 #include <boost/xpressive/xpressive.hpp>
 
